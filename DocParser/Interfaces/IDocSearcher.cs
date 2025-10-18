@@ -59,15 +59,4 @@ namespace DocParser.Interfaces
         /// <returns>Collection of advanced search results.</returns>
         Task<IAdvancedSearchResults> AdvancedSearch(string[] searchStrings);
     }
-
-    /// <summary>
-    /// Represents options for how the searcher should match strings.
-    /// </summary>
-    public enum SearchOption
-    {
-        MatchContainsIgnoreCase,
-        MatchExact,
-        MatchStartsWith,
-        MatchEndsWith
-    }
 }
