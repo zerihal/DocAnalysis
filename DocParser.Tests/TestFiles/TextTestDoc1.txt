@@ -1,0 +1,18 @@
+Test File 2 (TXT)
+
+This is a test file to test some links.
+
+1)	Link for Open-Meteo:
+
+https://open-meteo.com/
+
+Some additional links:
+
+https://www.google.co.uk/
+www.bbc.co.uk
+https://en.wikipedia.org/wiki/Lists_of_earthquakes
+www.news.sky.com/uk
+
+The following is redirected …
+
+http://www.helloworld.com
