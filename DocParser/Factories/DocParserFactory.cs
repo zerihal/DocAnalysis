@@ -4,6 +4,9 @@ using DocParser.Parsers;
 
 namespace DocParser.Factories
 {
+    /// <summary>
+    /// Factory for creating document parser instances.
+    /// </summary>
     public static class DocParserFactory
     {
         /// <summary>

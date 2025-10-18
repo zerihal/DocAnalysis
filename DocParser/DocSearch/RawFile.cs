@@ -4,6 +4,7 @@ using DocParser.Strings;
 
 namespace DocParser.DocSearch
 {
+    /// <inheritdoc/>
     public class RawFile : IRawFile
     {
         /// <inheritdoc/>
@@ -18,6 +19,11 @@ namespace DocParser.DocSearch
         /// <inheritdoc/>
         public RawFileType FileType { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RawFile"/> class.
+        /// </summary>
+        /// <param name="fileName">File name.</param>
+        /// <param name="content">File binary content.</param>
         public RawFile(string fileName, byte[] content)
         {
             FileName = fileName;

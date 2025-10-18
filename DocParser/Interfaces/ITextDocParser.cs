@@ -2,6 +2,9 @@
 
 namespace DocParser.Interfaces
 {
+    /// <summary>
+    /// Document parser for generic text documents.
+    /// </summary>
     public interface ITextDocParser : IDocParser
     {
         /// <summary>

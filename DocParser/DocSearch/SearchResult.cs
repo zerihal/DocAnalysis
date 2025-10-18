@@ -28,6 +28,12 @@ namespace DocParser.DocSearch
         /// <summary>
         /// Creates a new instance of <see cref="SearchResult"/>.
         /// </summary>
+        /// <param name="sentence">Sentence containing the search string.</param>
+        /// <param name="position">Position of the search string within the paragraph.</param>
+        /// <param name="paragraph">Paragraph containing the search string.</param>
+        /// <param name="paragraphNo">Paragraph number containing the search result.</param>
+        /// <param name="page">Page number containing the search result (applicable to PDF only).</param>
+        /// <param name="document">The document that the search result was found in.</param>
         public SearchResult(string sentence, int position, string paragraph, int paragraphNo, int page, string document)
         {
             Sentence = sentence;
@@ -59,12 +65,24 @@ namespace DocParser.DocSearch
         {
             return HashCode.Combine(Sentence, Position, Page, Document);
         }
-        
+
+        /// <summary>
+        /// Default equality operator.
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static bool operator ==(SearchResult? left, SearchResult? right)
         {
             return EqualityComparer<SearchResult>.Default.Equals(left, right);
         }
 
+        /// <summary>
+        /// Default inequality operator.
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
         public static bool operator !=(SearchResult? left, SearchResult? right)
         {
             return !(left == right);

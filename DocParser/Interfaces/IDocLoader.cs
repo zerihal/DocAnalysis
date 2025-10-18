@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DocParser.Interfaces
+﻿namespace DocParser.Interfaces
 {
+    /// <summary>
+    /// Document loader to load files for parsing.
+    /// </summary>
     public interface IDocLoader
     {
         /// <summary>

@@ -3,6 +3,9 @@ using DocParser.Strings;
 
 namespace DocParser.Parsers
 {
+    /// <summary>
+    /// Generic document parser for text-based documents.
+    /// </summary>
     public class GenericDocParser : TextDocParser
     {
         /// <summary>

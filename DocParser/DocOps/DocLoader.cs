@@ -4,6 +4,7 @@ using System.Text;
 
 namespace DocParser.DocOps
 {
+    /// <inheritdoc/>
     public class DocLoader : IDocLoader
     {
         private const string OdtExt = ".odt";

@@ -3,10 +3,15 @@ using System.Collections;
 
 namespace DocParser.DocSearch
 {
+    /// <inheritdoc/>
     public abstract class SearchResultsBase<T> : ISearchResultCollection<T>
     {
+        /// <summary>
+        /// Internal collection of search results.
+        /// </summary>
         protected List<T> _results = new List<T>();
 
+        /// <inheritdoc/>
         public int DiscoveredCount => _results.Count();
 
         /// <summary>

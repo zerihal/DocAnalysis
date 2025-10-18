@@ -3,14 +3,23 @@ using DocParser.Interfaces;
 
 namespace DocParser.DocSearch
 {
+    /// <inheritdoc/>
     public class AdvancedSearchResult : IAdvancedSearchResult
     {
+        /// <inheritdoc/>
         public IEnumerable<ISearchResult> MatchesInParagraph { get; }
 
+        /// <inheritdoc/>
         public AdvancedMatch MatchType { get; private set; }
 
+        /// <inheritdoc/>
         public decimal MatchRating { get; private set; }
 
+        /// <summary>
+        /// Initialises a new instance of <see cref="AdvancedSearchResult"/>.
+        /// </summary>
+        /// <param name="matchesInParagraph"><see cref="ISearchResult"/> matches in paragraph.</param>
+        /// <param name="searchStrings">Search strings that were used to obtain search result.</param>
         public AdvancedSearchResult(IEnumerable<ISearchResult> matchesInParagraph, IEnumerable<string> searchStrings)
         {
             MatchesInParagraph = matchesInParagraph;

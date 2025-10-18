@@ -2,6 +2,9 @@
 
 namespace DocParser.Interfaces
 {
+    /// <summary>
+    /// Raw file for parsing or searching.
+    /// </summary>
     public interface IRawFile
     {
         /// <summary>

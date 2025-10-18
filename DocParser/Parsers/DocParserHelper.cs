@@ -2,6 +2,9 @@
 
 namespace DocParser.Parsers
 {
+    /// <summary>
+    /// Helper methods for document parsing.
+    /// </summary>
     public static class DocParserHelper
     {
         // Matches http, https, and www. links
@@ -61,7 +64,7 @@ namespace DocParser.Parsers
         {
             var docText = string.Empty;
             error = null;
-            FileStream fileStream = null;
+            FileStream? fileStream = null;
 
             if (File.Exists(filePath))
             {

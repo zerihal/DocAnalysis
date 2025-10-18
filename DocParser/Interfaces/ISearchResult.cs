@@ -1,5 +1,8 @@
 ﻿namespace DocParser.Interfaces
 {
+    /// <summary>
+    /// Search result instance.
+    /// </summary>
     public interface ISearchResult
     {
         /// <summary>

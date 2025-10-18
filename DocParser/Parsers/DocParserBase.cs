@@ -4,6 +4,7 @@ using DocParser.Interfaces;
 
 namespace DocParser.Parsers
 {
+    /// <inheritdoc/>
     public abstract class DocParserBase : DocLoader, IDocParser
     {
         /// <inheritdoc/>

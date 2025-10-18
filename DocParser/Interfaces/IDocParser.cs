@@ -2,6 +2,9 @@
 
 namespace DocParser.Interfaces
 {
+    /// <summary>
+    /// Document parser for obtaining document hyperlinks.
+    /// </summary>
     public interface IDocParser : IDocLoader
     {
         /// <summary>

@@ -3,6 +3,9 @@ using System.Text;
 
 namespace DocParser.Logging
 {
+    /// <summary>
+    /// Static logger for logging messages during parsing and searching.
+    /// </summary>
     public static class Logger
     {
         private static StringBuilder _log = new StringBuilder();

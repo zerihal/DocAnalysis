@@ -3,6 +3,9 @@ using DocParser.EventArguments;
 
 namespace DocParser.Interfaces
 {
+    /// <summary>
+    /// Document searcher for loading documents and performing search operations.
+    /// </summary>
     public interface IDocSearcher
     {
         /// <summary>

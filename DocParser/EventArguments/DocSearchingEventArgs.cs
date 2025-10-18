@@ -2,6 +2,9 @@
 
 namespace DocParser.EventArguments
 {
+    /// <summary>
+    /// Event arguments for document searching process.
+    /// </summary>
     public class DocSearchingEventArgs : EventArgs
     {
         /// <summary>
@@ -14,6 +17,11 @@ namespace DocParser.EventArguments
         /// </summary>
         public int DocSearchCount { get; }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="DocSearchingEventArgs"/>.
+        /// </summary>
+        /// <param name="status">Document searcher status (<see cref="DocSearcherStatus"/>)</param>
+        /// <param name="docSearchCount">Count of documents seached.</param>
         public DocSearchingEventArgs(DocSearcherStatus status, int docSearchCount)
         {
             Status = status;

@@ -1,5 +1,9 @@
 ﻿namespace DocParser.Interfaces
 {
+    /// <summary>
+    /// Collection of search results.
+    /// </summary>
+    /// <typeparam name="T">Type of search results.</typeparam>
     public interface ISearchResultCollection<T> : IEnumerable<T>
     {
         /// <summary>

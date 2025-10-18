@@ -6,6 +6,9 @@ using System.Text;
 
 namespace DocParser.Parsers
 {
+    /// <summary>
+    /// Document parser for text documents.
+    /// </summary>
     public class TextDocParser : DocParserBase, ITextDocParser
     {
         /// <inheritdoc/>

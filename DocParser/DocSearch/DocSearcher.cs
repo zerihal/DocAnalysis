@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace DocParser.DocSearch
 {
+    /// <inheritdoc/>
     public class DocSearcher : IDocSearcher
     {
         private const string SentenceSplitPattern = @"(?<=[.!?])\s+"; // Split on ". ", "! ", or "? "
@@ -32,17 +33,28 @@ namespace DocParser.DocSearch
         /// <inheritdoc/>
         public DocSearchOptions SearcherOption { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocSearcher"/> class.
+        /// </summary>
         public DocSearcher() 
         {
             _docLoader = new DocLoader();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocSearcher"/> class with specified files.
+        /// </summary>
+        /// <param name="files">Files to load.</param>
         public DocSearcher(IEnumerable<string> files) : this()
         {
             _files = files;
             _ = LoadFilesInternal();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DocSearcher"/> class with specified file streams.
+        /// </summary>
+        /// <param name="fileStreams">File streams to load.</param>
         public DocSearcher(IEnumerable<Stream> fileStreams) : this()
         {
             _fileStreams = fileStreams;
