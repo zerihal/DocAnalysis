@@ -1,0 +1,11 @@
+name: Build and Package
+
+on:
+  workflow_dispatch:
+
+jobs:
+  call-template:
+    uses: zerihal/Workflow-Templates/.github/workflows/dotnet-release-pack-template.yml@main
+    with:
+      csproj_path: './DocParser/DocParser.csproj'
+      dotnet_version: '9.0.x'
