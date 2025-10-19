@@ -8,15 +8,24 @@
     <Title>Document Hyperlink Parser</Title>
     <Authors>JPS</Authors>
     <Description>Document parser to extract hyperlinks.</Description>
-    <PackageProjectUrl>https://github.com/zerihal/VeriLink</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/zerihal/VeriLink</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/zerihal/DocAnalysis</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/zerihal/DocAnalysis</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Document parsing, Hyperlink extraction, Link extraction, Hyperlink parsing</PackageTags>
+    <PackageTags>Document parsing; Document analysis; Hyperlink extraction; Link extraction</PackageTags>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Version>1.0.1</Version>
     <AssemblyVersion>1.0.1.1</AssemblyVersion>
     <FileVersion>1.0.1.1</FileVersion>
+    <Copyright>JPS</Copyright>
+    <PackageReadmeFile>PACKAGE_README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\PACKAGE_README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
