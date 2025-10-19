@@ -7,13 +7,13 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Document Hyperlink Parser</Title>
     <Authors>JPS</Authors>
-    <Description>Document parser to extract hyperlinks.</Description>
+    <Description>Document parser to extract hyperlinks from multiple documents, scan for keywords and return results by paragraph and sentence with match ratings.</Description>
     <PackageProjectUrl>https://github.com/zerihal/DocAnalysis</PackageProjectUrl>
     <RepositoryUrl>https://github.com/zerihal/DocAnalysis</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>Document parsing; Document analysis; Hyperlink extraction; Link extraction</PackageTags>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>1.0.1.2</Version>
+    <Version>1.0.1.3</Version>
     <AssemblyVersion>1.0.1.1</AssemblyVersion>
     <FileVersion>1.0.1.1</FileVersion>
     <Copyright>JPS</Copyright>
