@@ -13,6 +13,9 @@ namespace DocParser.Parsers
     public class WordDocParser : DocParserBase, IWordDocParser
     {
         /// <inheritdoc/>
+        public override string[] ApplicableFileTypes => [".docx"];
+
+        /// <inheritdoc/>
         public override IEnumerable<string> GetDocLinks()
         {
             var docLinks = new List<string>();

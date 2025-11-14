@@ -11,6 +11,9 @@ namespace DocParser.Parsers
         public event EventHandler<LinksObtainedEventArgs>? LinksObtainedAsync;
 
         /// <inheritdoc/>
+        public abstract string[] ApplicableFileTypes { get; }
+
+        /// <inheritdoc/>
         public abstract IEnumerable<string> GetDocLinks();
 
         /// <inheritdoc/>
@@ -19,6 +22,12 @@ namespace DocParser.Parsers
             var links = GetDocLinks();
             OnLinksObtained(new LinksObtainedEventArgs(links));
             await Task.CompletedTask;
+        }
+
+        /// <inheritdoc/>
+        public virtual bool IsApplicableForFile(string fileOrExt)
+        {
+            return ApplicableFileTypes.Contains(Path.GetExtension(fileOrExt).ToLowerInvariant());
         }
 
         private void OnLinksObtained(LinksObtainedEventArgs e) => LinksObtainedAsync?.Invoke(this, e);
