@@ -13,7 +13,7 @@ namespace DocParser.Interfaces
         event EventHandler<LinksObtainedEventArgs>? LinksObtainedAsync;
 
         /// <summary>
-        /// 
+        /// File types (extensions) applicable for the doc parser instance.
         /// </summary>
         string[] ApplicableFileTypes { get; }
 
