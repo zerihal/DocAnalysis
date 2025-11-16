@@ -25,6 +25,9 @@ namespace DocParser.DocSearch
         /// <inheritdoc/>
         public string Document { get; }
 
+        /// <inheritdoc/>
+        public int FileIndex { get; }
+
         /// <summary>
         /// Creates a new instance of <see cref="SearchResult"/>.
         /// </summary>
@@ -34,7 +37,7 @@ namespace DocParser.DocSearch
         /// <param name="paragraphNo">Paragraph number containing the search result.</param>
         /// <param name="page">Page number containing the search result (applicable to PDF only).</param>
         /// <param name="document">The document that the search result was found in.</param>
-        public SearchResult(string sentence, int position, string paragraph, int paragraphNo, int page, string document)
+        public SearchResult(string sentence, int position, string paragraph, int paragraphNo, int page, string document, int fileIndex)
         {
             Sentence = sentence;
             Position = position;
@@ -42,6 +45,7 @@ namespace DocParser.DocSearch
             ParagraphNumber = paragraphNo;
             Page = page;
             Document = document;
+            FileIndex = fileIndex;
         }
 
         /// <inheritdoc/>

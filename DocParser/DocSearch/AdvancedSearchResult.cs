@@ -15,6 +15,9 @@ namespace DocParser.DocSearch
         /// <inheritdoc/>
         public decimal MatchRating { get; private set; }
 
+        /// <inheritdoc/>
+        public int FileIndex => MatchesInParagraph.FirstOrDefault()?.FileIndex ?? -1;
+
         /// <summary>
         /// Initialises a new instance of <see cref="AdvancedSearchResult"/>.
         /// </summary>

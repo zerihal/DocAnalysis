@@ -8,6 +8,9 @@ namespace DocParser.DocSearch
     public class RawFile : IRawFile
     {
         /// <inheritdoc/>
+        public int FileIndex { get; }
+
+        /// <inheritdoc/>
         public string FileName { get; }
 
         /// <inheritdoc/>
@@ -24,8 +27,9 @@ namespace DocParser.DocSearch
         /// </summary>
         /// <param name="fileName">File name.</param>
         /// <param name="content">File binary content.</param>
-        public RawFile(string fileName, byte[] content)
+        public RawFile(string fileName, byte[] content, int index)
         {
+            FileIndex = index;
             FileName = fileName;
             FileExtension = FileName == SR.FileStreamDocName ? $".{SR.FileStreamDocName}" : Path.GetExtension(fileName);
             FileType = FileExtension.ToLower() switch

@@ -134,6 +134,11 @@ namespace DocParser.DocSearch
             return advSearchResults;
         }
 
+        //public static async Task<ISearchResults> SearchFile(string searchStrings, string rawFile)
+        //{
+            
+        //}
+
         /// <summary>
         /// Loads files into the searcher (internal).
         /// </summary>
@@ -141,6 +146,7 @@ namespace DocParser.DocSearch
         private async Task LoadFilesInternal()
         {
             var noFileLoad = false;
+            var fileIndex = 0;
 
             if (_files != null)
             {
@@ -148,8 +154,10 @@ namespace DocParser.DocSearch
                 {
                     if (_docLoader.LoadFile(stringFile) && _docLoader.RawFile != null)
                     {
-                        RawFiles.Add(new RawFile(stringFile, _docLoader.RawFile));
+                        RawFiles.Add(new RawFile(stringFile, _docLoader.RawFile, fileIndex));
                     }
+
+                    fileIndex++;
                 }
             }
             else if (_fileStreams != null)
@@ -158,8 +166,10 @@ namespace DocParser.DocSearch
                 {
                     if (_docLoader.LoadFile(streamFile) && _docLoader.RawFile != null)
                     {
-                        RawFiles.Add(new RawFile(SR.FileStreamDocName, _docLoader.RawFile));
+                        RawFiles.Add(new RawFile(SR.FileStreamDocName, _docLoader.RawFile, fileIndex));
                     }
+
+                    fileIndex++;
                 }
             }
             else
@@ -269,7 +279,10 @@ namespace DocParser.DocSearch
                     if (matchesInSentence?.Any() ?? false)
                     {
                         foreach (var matchInSentence in matchesInSentence)
-                            results.Add(new SearchResult(sentence, matchInSentence, paragraph.Value, paragraph.Key, -1, rawFile.FileName));
+                        {
+                            results.Add(new SearchResult(sentence, matchInSentence, paragraph.Value, paragraph.Key, -1, 
+                                rawFile.FileName, rawFile.FileIndex));
+                        }
                     }
                 }
             }

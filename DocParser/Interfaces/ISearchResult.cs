@@ -41,5 +41,10 @@
         /// The document that the search result was found in.
         /// </summary>
         string Document { get; }
+
+        /// <summary>
+        /// File index within collection of <see cref="IRawFile"/> instances.
+        /// </summary>
+        int FileIndex { get; }
     }
 }

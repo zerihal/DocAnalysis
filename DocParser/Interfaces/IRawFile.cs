@@ -8,6 +8,11 @@ namespace DocParser.Interfaces
     public interface IRawFile
     {
         /// <summary>
+        /// Raw file index from searcher collection.
+        /// </summary>
+        int FileIndex { get; }
+
+        /// <summary>
         /// File name without path.
         /// </summary>
         string FileName { get; }

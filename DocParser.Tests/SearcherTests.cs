@@ -57,5 +57,23 @@ namespace DocParser.Tests
             Assert.Equal(searchResults?.Count(), 10);
             Assert.Equal(searchResults?.FirstOrDefault()?.MatchRating, (decimal)3.02);
         }
+
+        [Fact]
+        public async Task MultiFileSearcherTest()
+        {
+            // ToDo: Test to be completed for mutliple file search with single search string.
+
+            await Task.CompletedTask;
+            Assert.True(true);
+        }
+
+        [Fact]
+        public async Task MultiFileAdvSearcherTest()
+        {
+            // ToDo: Test to be completed for multiple file search with multiple search terms.
+
+            await Task.CompletedTask;
+            Assert.True(true);
+        }
     }
 }

@@ -22,5 +22,11 @@ namespace DocParser.Interfaces
         /// Rating of the matches within the paragraph. This higher the rating the better the match.
         /// </summary>
         decimal MatchRating { get; }
+
+        /// <summary>
+        /// File index within collection of <see cref="IRawFile"/> instances (-1 will indicate invalid 
+        /// or null raw file index).
+        /// </summary>
+        int FileIndex { get; }
     }
 }

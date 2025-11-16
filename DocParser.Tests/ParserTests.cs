@@ -76,8 +76,8 @@ namespace DocParser.Tests
         {
             var searchResults = new SearchResults("test")
             {
-                new SearchResult("This is a test.", 10, "This is a test. Some other text", 1, 1, @"C:\DummyDoc.txt"),
-                new SearchResult("This is another test.", 16, "This is another test. Some more other text", 1, 1, @"C:\DummyDoc.txt")
+                new SearchResult("This is a test.", 10, "This is a test. Some other text", 1, 1, @"C:\DummyDoc.txt", 0),
+                new SearchResult("This is another test.", 16, "This is another test. Some more other text", 1, 1, @"C:\DummyDoc.txt", 0)
             };
 
             Assert.Equal(2, searchResults.DiscoveredCount);
