@@ -12,6 +12,9 @@ namespace DocParser.Parsers
     public class TextDocParser : DocParserBase, ITextDocParser
     {
         /// <inheritdoc/>
+        public override string[] ApplicableFileTypes => [".txt", ".rtf"];
+
+        /// <inheritdoc/>
         public TextDocEncoding TextEncoding { get; set; } = TextDocEncoding.UTF8;
 
         /// <inheritdoc/>

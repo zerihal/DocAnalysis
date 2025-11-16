@@ -13,10 +13,22 @@ namespace DocParser.Interfaces
         event EventHandler<LinksObtainedEventArgs>? LinksObtainedAsync;
 
         /// <summary>
+        /// File types (extensions) applicable for the doc parser instance.
+        /// </summary>
+        string[] ApplicableFileTypes { get; }
+
+        /// <summary>
         /// Gets the document hyperlinks (sync).
         /// </summary>
         /// <returns>List of document hyperlinks.</returns>
         IEnumerable<string> GetDocLinks();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileOrExt"></param>
+        /// <returns></returns>
+        bool IsApplicableForFile(string fileOrExt);
 
         /// <summary>
         /// Gets the document hyperlinks (async), firing a LinksObtainedAsync event on completion.

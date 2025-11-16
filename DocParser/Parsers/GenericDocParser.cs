@@ -8,6 +8,9 @@ namespace DocParser.Parsers
     /// </summary>
     public class GenericDocParser : TextDocParser
     {
+        /// <inheritdoc/>
+        public override string[] ApplicableFileTypes => [".doc", ".odt"];
+
         /// <summary>
         /// Attempts to obtain the document text from the file stream and then loads it to be used by the parser.
         /// </summary>
