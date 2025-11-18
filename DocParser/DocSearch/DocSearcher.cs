@@ -14,8 +14,7 @@ namespace DocParser.DocSearch
     {
         private const string SentenceSplitPattern = @"(?<=[.!?])\s+"; // Split on ". ", "! ", or "? "
 
-        private IEnumerable<string>? _files;
-        private IEnumerable<Stream>? _fileStreams;
+        private IEnumerable<object>? _files;
         private IDocLoader _docLoader;
 
         /// <inheritdoc/>
@@ -45,45 +44,41 @@ namespace DocParser.DocSearch
         /// Initializes a new instance of the <see cref="DocSearcher"/> class with specified files.
         /// </summary>
         /// <param name="files">Files to load.</param>
-        public DocSearcher(IEnumerable<string> files) : this()
+        /// <remarks>
+        /// The collection of files should be of type string (file paths), streams, or IFormFiles. If files
+        /// are not of a supported type, no files will be loaded to the RawFiles collection.
+        /// </remarks>
+        public DocSearcher(IEnumerable<object> files) : this()
         {
             _files = files;
-            _ = LoadFilesInternal();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DocSearcher"/> class with specified file streams.
-        /// </summary>
-        /// <param name="fileStreams">File streams to load.</param>
-        public DocSearcher(IEnumerable<Stream> fileStreams) : this()
-        {
-            _fileStreams = fileStreams;
             _ = LoadFilesInternal();
         }
 
         /// <inheritdoc/>
         public async Task<bool> LoadFiles<T>(IEnumerable<T> files)
         {
+            // Type check.
+            if (!(typeof(T).IsAssignableFrom(typeof(string)) || 
+                typeof(T).IsAssignableFrom(typeof(Stream)) || 
+                typeof(T).IsAssignableFrom(typeof(IFormFileStream))))
+            {
+                return false;
+            }
+
             IsInitialised = false;
 
             // Clear and nullify collections
             RawFiles.Clear();
             _files = null;
-            _fileStreams = null;
 
-            if (files is IEnumerable<string> stringFiles)
+            if (files is IEnumerable<object> stringFiles)
             {
-                // Assuming _files is List<string> or compatible
+                // Assuming _files is List<object> or compatible
                 _files = stringFiles.ToList();
-            }
-            else if (files is IEnumerable<Stream> streamFiles)
-            {
-                // Assuming _fileStreams is List<Stream> or compatible
-                _fileStreams = streamFiles.ToList(); 
             }
             else
             {
-                throw new ArgumentException("Unsupported file type. Must be IEnumerable<string> or IEnumerable<Stream>.");
+                throw new ArgumentException("Unsupported file type. Must be IEnumerable<object>.");
             }
 
             await LoadFilesInternal();
@@ -134,11 +129,6 @@ namespace DocParser.DocSearch
             return advSearchResults;
         }
 
-        //public static async Task<ISearchResults> SearchFile(string searchStrings, string rawFile)
-        //{
-            
-        //}
-
         /// <summary>
         /// Loads files into the searcher (internal).
         /// </summary>
@@ -150,26 +140,50 @@ namespace DocParser.DocSearch
 
             if (_files != null)
             {
-                foreach (var stringFile in _files)
-                {
-                    if (_docLoader.LoadFile(stringFile) && _docLoader.RawFile != null)
-                    {
-                        RawFiles.Add(new RawFile(stringFile, _docLoader.RawFile, fileIndex));
-                    }
+                var fileType = _files.FirstOrDefault()?.GetType();
 
-                    fileIndex++;
-                }
-            }
-            else if (_fileStreams != null)
-            {
-                foreach (var streamFile in _fileStreams)
+                if (fileType != null)
                 {
-                    if (_docLoader.LoadFile(streamFile) && _docLoader.RawFile != null)
+                    switch (fileType)
                     {
-                        RawFiles.Add(new RawFile(SR.FileStreamDocName, _docLoader.RawFile, fileIndex));
-                    }
+                        case var _ when fileType == typeof(string):
+                            foreach (var stringFile in _files.Cast<string>())
+                            {
+                                if (_docLoader.LoadFile(stringFile) && _docLoader.RawFile != null)
+                                {
+                                    RawFiles.Add(new RawFile(stringFile, _docLoader.RawFile, fileIndex));
+                                }
 
-                    fileIndex++;
+                                fileIndex++;
+                            }
+                            break;
+
+                        case var _ when fileType == typeof(Stream):
+                            foreach (var streamFile in _files.Cast<Stream>())
+                            {
+                                if (_docLoader.LoadFile(streamFile) && _docLoader.RawFile != null)
+                                {
+                                    RawFiles.Add(new RawFile(SR.FileStreamDocName, _docLoader.RawFile, fileIndex));
+                                }
+
+                                fileIndex++;
+                            }
+                            break;
+
+                        case var _ when fileType == typeof(IFormFileStream):
+                            foreach (var formFileStream in _files.Cast<IFormFileStream>())
+                            {
+                                if (_docLoader.LoadFile(formFileStream.FileStream) && _docLoader.RawFile != null)
+                                {
+                                    RawFiles.Add(new RawFile(formFileStream.FormFileName, _docLoader.RawFile, fileIndex));
+                                }
+                            }
+                            break;
+
+                        default:
+                            noFileLoad = true;
+                            break;
+                    }
                 }
             }
             else
