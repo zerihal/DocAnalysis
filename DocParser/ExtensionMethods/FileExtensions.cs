@@ -15,7 +15,7 @@ namespace DocParser.ExtensionMethods
         /// </summary>
         /// <param name="files">Collection of <see cref="IFormFile"/>.</param>
         /// <returns>Collection of <see cref="IFormFileStream"/>.</returns>
-        public static IEnumerable<IFormFileStream> ToFormFiles(this IEnumerable<IFormFile> files)
+        public static IEnumerable<IFormFileStream> ToFormFileStreams(this IEnumerable<IFormFile> files)
         {
             var filesList = new List<IFormFileStream>();
 
