@@ -46,6 +46,17 @@ namespace DocParser.Interfaces
         Task<bool> LoadFiles<T>(IEnumerable<T> files);
 
         /// <summary>
+        /// Loads files into the searcher
+        /// </summary>
+        /// <param name="files">Collection of files, streams, or <see cref="IFormFileStream"/>.</param>
+        /// <returns><see langword="True"/> if files loaded, otherwise <see langword="false"/>.</returns>
+        /// <remarks>
+        /// If files are all of same type, use <see cref="LoadFiles{T}(IEnumerable{T})"/> to specify the type and utilise a 
+        /// more efficient file loading method.
+        /// </remarks>
+        Task<bool> LoadFiles(IEnumerable<object> files);
+
+        /// <summary>
         /// Searches the loaded files for the specified search string.
         /// </summary>
         /// <param name="searchString">String to search for.</param>

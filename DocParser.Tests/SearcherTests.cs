@@ -1,9 +1,54 @@
 ﻿using DocParser.DocSearch;
+using DocParser.ExtensionMethods;
+using DocParser.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 
 namespace DocParser.Tests
 {
     public class SearcherTests
     {
+        private const int MaxDelayAwaits = 50; // Each delay is 100ms, so max (100ms x 50) is approx 5 seconds
+
+        [Fact]
+        public async Task FormFileSearcerTest()
+        {
+            var testFilePath = Path.Combine(AppContext.BaseDirectory, "TestFiles", "SearchTest1.docx");
+            var binFile = File.ReadAllBytes(testFilePath);
+            var stream = new MemoryStream(binFile);
+
+            // First check with a binary file with plain text content type
+            await DoSearch(stream, "text/plain");
+
+            // Next check with different content type (Word specific)
+            stream.Position = 0;
+            await DoSearch(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
+            async Task DoSearch(MemoryStream stream, string contentType)
+            {
+                // Create an instance of IFormFile
+                var formFile = new FormFile(stream, 0, stream.Length, "file", "SearchTest1.docx")
+                {
+                    Headers = new HeaderDictionary(),
+                    ContentType = contentType
+                };
+
+                var formFiles = new List<IFormFile> { formFile };
+                var formFileStreams = formFiles.ToFormFileStreams();
+
+                var searcher = new DocSearcher(formFileStreams);
+
+                // Wait for files to be loaded
+                await SearcherInit(searcher);
+
+                Assert.NotNull(searcher);
+                Assert.Single(searcher.RawFiles);
+
+                var searchResults = await searcher.Search("regarding cats");
+                Assert.Equal(24, searchResults.DiscoveredCount);
+            }
+        }
+
         [Fact]
         public async Task SingleFileSearcherTest()
         {
@@ -11,10 +56,7 @@ namespace DocParser.Tests
             var searcher = new DocSearcher([testFilePath]);
 
             // Wait for files to be loaded
-            while (!searcher.IsInitialised)
-            {
-                await Task.Delay(100);
-            }
+            await SearcherInit(searcher);
 
             Assert.True(searcher.IsInitialised);
             Assert.Single(searcher.RawFiles);
@@ -42,10 +84,7 @@ namespace DocParser.Tests
             var searcher = new DocSearcher(new[] { testFilePath });
 
             // Wait for files to be loaded
-            while (!searcher.IsInitialised)
-            {
-                await Task.Delay(100);
-            }
+            await SearcherInit(searcher);
 
             Assert.True(searcher.IsInitialised);
             Assert.Single(searcher.RawFiles);
@@ -74,6 +113,23 @@ namespace DocParser.Tests
 
             await Task.CompletedTask;
             Assert.True(true);
+        }
+
+        private async Task SearcherInit(IDocSearcher searcher)
+        {
+            var delayAwaits = 0;
+            var delayInterval = 100;
+
+            while (!searcher.IsInitialised)
+            {
+                if (delayAwaits >= MaxDelayAwaits)
+                    break;
+
+                await Task.Delay(delayInterval);
+                delayAwaits += delayInterval;
+            }
+
+            Assert.True(searcher.IsInitialised, "Searcher initialisation timed out (returned false)");
         }
     }
 }

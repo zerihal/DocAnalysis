@@ -5,6 +5,7 @@ using DocParser.Interfaces;
 using DocParser.Strings;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace DocParser.DocSearch
@@ -50,38 +51,41 @@ namespace DocParser.DocSearch
         /// </remarks>
         public DocSearcher(IEnumerable<object> files) : this()
         {
-            _files = files;
-            _ = LoadFilesInternal();
+            _ = LoadFiles(files);
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> LoadFiles(IEnumerable<object> files)
+        {
+            IsInitialised = false;
+
+            PreLoadFiles(files);
+
+            var filesAllSameType = false;
+
+            if (files.Select(f => f?.GetType()).Distinct().Count() <= 1)
+            {
+                // Perform valid type check
+                if (!IsValidType(files.First().GetType()))
+                    return false;
+
+                filesAllSameType = true;
+            }
+
+            await LoadFilesInternal(filesAllSameType);
+
+            return false;
         }
 
         /// <inheritdoc/>
         public async Task<bool> LoadFiles<T>(IEnumerable<T> files)
         {
-            // Type check.
-            if (!(typeof(T).IsAssignableFrom(typeof(string)) || 
-                typeof(T).IsAssignableFrom(typeof(Stream)) || 
-                typeof(T).IsAssignableFrom(typeof(IFormFileStream))))
-            {
+            if (!IsValidType(typeof(T)))
                 return false;
-            }
 
-            IsInitialised = false;
+            PreLoadFiles((IEnumerable<object>)files);
 
-            // Clear and nullify collections
-            RawFiles.Clear();
-            _files = null;
-
-            if (files is IEnumerable<object> stringFiles)
-            {
-                // Assuming _files is List<object> or compatible
-                _files = stringFiles.ToList();
-            }
-            else
-            {
-                throw new ArgumentException("Unsupported file type. Must be IEnumerable<object>.");
-            }
-
-            await LoadFilesInternal();
+            await LoadFilesInternal(true);
             return IsInitialised;
         }
 
@@ -130,60 +134,152 @@ namespace DocParser.DocSearch
         }
 
         /// <summary>
+        /// Pre-load files action - clears existing raw files and initialised flag, checks collection and repopulates 
+        /// internal files collection.
+        /// </summary>
+        /// <param name="files">Files to load.</param>
+        /// <exception cref="ArgumentException">Thrown if unsupported type or null/invalid input collection.</exception>
+        private void PreLoadFiles(IEnumerable<object> files)
+        {
+            IsInitialised = false;
+
+            // Clear and nullify collections
+            RawFiles.Clear();
+            _files = null;
+
+            if (files is IEnumerable<object> objectFiles)
+            {
+                // Assuming _files is List<object> or compatible
+                _files = objectFiles.ToList();
+            }
+            else
+            {
+                throw new ArgumentException("Unsupported file type. Must be IEnumerable<object>.");
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the type is valid for the DocSearcher.
+        /// </summary>
+        /// <param name="type">File object type.</param>
+        /// <returns><see langword="True"/> if valid/supported, otherwise <see langword="false"/>.</returns>
+        private bool IsValidType(Type type)
+        {
+            // Type check.
+            if (type.IsAssignableFrom(typeof(string)) ||
+                type.IsAssignableFrom(typeof(Stream)) ||
+                typeof(IFormFileStream).IsAssignableFrom(type))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Loads files into the searcher (internal).
         /// </summary>
         /// <returns>Completed task.</returns>
-        private async Task LoadFilesInternal()
+        private async Task LoadFilesInternal(bool ofSameType)
         {
             var noFileLoad = false;
             var fileIndex = 0;
 
             if (_files != null)
             {
-                var fileType = _files.FirstOrDefault()?.GetType();
-
-                if (fileType != null)
+                if (ofSameType)
                 {
-                    switch (fileType)
+                    // Files are all same type - cast and batch load
+                    var fileType = _files.FirstOrDefault()?.GetType();
+
+                    if (fileType != null)
                     {
-                        case var _ when fileType == typeof(string):
-                            foreach (var stringFile in _files.Cast<string>())
-                            {
-                                if (_docLoader.LoadFile(stringFile) && _docLoader.RawFile != null)
+                        switch (fileType)
+                        {
+                            case var _ when fileType == typeof(string):
+                                foreach (var stringFile in _files.Cast<string>())
                                 {
-                                    RawFiles.Add(new RawFile(stringFile, _docLoader.RawFile, fileIndex));
+                                    if (_docLoader.LoadFile(stringFile) && _docLoader.RawFile != null)
+                                    {
+                                        RawFiles.Add(new RawFile(stringFile, _docLoader.RawFile, fileIndex));
+                                    }
+
+                                    fileIndex++;
                                 }
+                                break;
 
-                                fileIndex++;
-                            }
-                            break;
-
-                        case var _ when fileType == typeof(Stream):
-                            foreach (var streamFile in _files.Cast<Stream>())
-                            {
-                                if (_docLoader.LoadFile(streamFile) && _docLoader.RawFile != null)
+                            case var _ when fileType == typeof(Stream):
+                                foreach (var streamFile in _files.Cast<Stream>())
                                 {
-                                    RawFiles.Add(new RawFile(SR.FileStreamDocName, _docLoader.RawFile, fileIndex));
+                                    if (_docLoader.LoadFile(streamFile) && _docLoader.RawFile != null)
+                                    {
+                                        RawFiles.Add(new RawFile(SR.FileStreamDocName, _docLoader.RawFile, fileIndex));
+                                    }
+
+                                    fileIndex++;
                                 }
+                                break;
 
-                                fileIndex++;
-                            }
-                            break;
-
-                        case var _ when fileType == typeof(IFormFileStream):
-                            foreach (var formFileStream in _files.Cast<IFormFileStream>())
-                            {
-                                if (_docLoader.LoadFile(formFileStream.FileStream) && _docLoader.RawFile != null)
+                            case var _ when typeof(IFormFileStream).IsAssignableFrom(fileType):
+                                foreach (var formFileStream in _files.Cast<IFormFileStream>())
                                 {
-                                    RawFiles.Add(new RawFile(formFileStream.FormFileName, _docLoader.RawFile, fileIndex));
+                                    if (_docLoader.LoadFile(formFileStream.FileStream) && _docLoader.RawFile != null)
+                                    {
+                                        RawFiles.Add(new RawFile(formFileStream.FormFileName, _docLoader.RawFile, fileIndex));
+                                    }
                                 }
-                            }
-                            break;
+                                break;
 
-                        default:
-                            noFileLoad = true;
-                            break;
+                            default:
+                                noFileLoad = true;
+                                break;
+                        }
                     }
+                }
+                else
+                {
+                    // Mixed file types - load individually
+                    foreach (var file in _files)
+                    {
+                        if (file is string stringFile)
+                        {
+                            // Load string file
+                            if (_docLoader.LoadFile(stringFile) && _docLoader.RawFile != null)
+                            {
+                                RawFiles.Add(new RawFile(stringFile, _docLoader.RawFile, fileIndex));
+                            }
+                        }
+                        else
+                        {
+                            // Load form file or stream file
+                            Stream? fileStream = null;
+                            string? fileName = null;
+
+                            if (file is IFormFileStream formFileStream)
+                            {
+                                fileStream = formFileStream.FileStream;
+                                fileName = formFileStream.FormFileName;
+                            }
+                            else if (file is Stream stream)
+                            {
+                                fileStream = stream;
+                                fileName = SR.FileStreamDocName;
+                            }
+
+                            if (fileStream != null && fileName != null)
+                            {
+                                if (_docLoader.LoadFile(fileStream) && _docLoader.RawFile != null)
+                                {
+                                    RawFiles.Add(new RawFile(fileName, _docLoader.RawFile, fileIndex));
+                                }
+                            }
+                        }
+
+                        // File index is always incremented regardless of whether raw file could be added or not
+                        fileIndex++;
+                    }
+
+                    noFileLoad = !RawFiles.Any();
                 }
             }
             else
@@ -209,96 +305,103 @@ namespace DocParser.DocSearch
             var paragraphs = new Dictionary<int, string>();
             var paragraphNo = 0;
             var ignoreCase = !SearcherOption.HasFlag(DocSearchOptions.CaseSensitive);
-            var matchExact = SearcherOption.HasFlag(DocSearchOptions.MatchExact);            
+            var matchExact = SearcherOption.HasFlag(DocSearchOptions.MatchExact);
 
-            if (rawFile.FileType == RawFileType.Word)
+            try
             {
-                using (var memStream = new MemoryStream(rawFile.Content))
+                if (rawFile.FileType == RawFileType.Word)
                 {
-                    using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memStream, false))
+                    using (var memStream = new MemoryStream(rawFile.Content))
                     {
-                        // Parse though paragraphs in the document body
-                        if (wordDoc.MainDocumentPart?.Document.Body is Body body)
+                        using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memStream, false))
                         {
-                            // Get all non-empty paragraphs
-                            var allNonEmptyParagraphs = body.Elements<Paragraph>().Select(p => p.InnerText.Trim()).
-                                            Where(t => !string.IsNullOrEmpty(t)).ToList();
-
-                            foreach (var para in allNonEmptyParagraphs)
+                            // Parse though paragraphs in the document body
+                            if (wordDoc.MainDocumentPart?.Document.Body is Body body)
                             {
-                                // Always increment paragraph number
-                                paragraphNo++;
+                                // Get all non-empty paragraphs
+                                var allNonEmptyParagraphs = body.Elements<Paragraph>().Select(p => p.InnerText.Trim()).
+                                                Where(t => !string.IsNullOrEmpty(t)).ToList();
 
-                                // If paragraph contains search string then add along with paragraph number
-                                if (para.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
-                                    paragraphs.Add(paragraphNo, para);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                using (var streamReader = new StreamReader(new MemoryStream(rawFile.Content)))
-                {
-                    // First check whether there are any instances of the search string in the document - 
-                    // if not then no point in parsing.
-                    if (streamReader.ReadToEnd().Contains(searchString))
-                    {
-                        streamReader.BaseStream.Seek(0, SeekOrigin.Begin);
-
-                        while (streamReader.ReadLine() is string line)
-                        {
-                            // Ignore empty lines
-                            if (line.Length > 0)
-                            {
-                                // Always increment paragraph number
-                                paragraphNo++;
-
-                                // Ignore lines not containing the search string
-                                if (!line.Contains(searchString, ignoreCase ? StringComparison.InvariantCultureIgnoreCase : 
-                                    StringComparison.InvariantCulture))
+                                foreach (var para in allNonEmptyParagraphs)
                                 {
-                                    continue;
-                                }                                    
+                                    // Always increment paragraph number
+                                    paragraphNo++;
 
-                                // Note: ReadLine continues until it hits a newline char, so each is a paragraph in 
-                                // this case.
-                                paragraphs.Add(paragraphNo, line.Trim());
+                                    // If paragraph contains search string then add along with paragraph number
+                                    if (para.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
+                                        paragraphs.Add(paragraphNo, para);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    using (var streamReader = new StreamReader(new MemoryStream(rawFile.Content)))
+                    {
+                        // First check whether there are any instances of the search string in the document - 
+                        // if not then no point in parsing.
+                        if (streamReader.ReadToEnd().Contains(searchString))
+                        {
+                            streamReader.BaseStream.Seek(0, SeekOrigin.Begin);
+
+                            while (streamReader.ReadLine() is string line)
+                            {
+                                // Ignore empty lines
+                                if (line.Length > 0)
+                                {
+                                    // Always increment paragraph number
+                                    paragraphNo++;
+
+                                    // Ignore lines not containing the search string
+                                    if (!line.Contains(searchString, ignoreCase ? StringComparison.InvariantCultureIgnoreCase :
+                                        StringComparison.InvariantCulture))
+                                    {
+                                        continue;
+                                    }
+
+                                    // Note: ReadLine continues until it hits a newline char, so each is a paragraph in 
+                                    // this case.
+                                    paragraphs.Add(paragraphNo, line.Trim());
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach (var paragraph in paragraphs)
+                {
+                    // Get all sentences in the paragraph
+                    var sentences = Regex.Split(paragraph.Value, SentenceSplitPattern);
+
+                    // Find all matches in paragraph
+                    var matchCollection = matchExact ? GetWholeWordMatches(paragraph.Value, searchString, ignoreCase) :
+                        Regex.Matches(paragraph.Value, Regex.Escape(searchString), RegexOptions.IgnoreCase);
+
+                    var matches = matchCollection.Cast<Match>().Select(m => m.Index);
+
+                    // Parse sentences to find matching search results
+                    foreach (var sentence in sentences)
+                    {
+                        // The following assumes no repeated sentences in paragraph - might want to improve this in future!
+                        var startIndex = paragraph.Value.IndexOf(sentence);
+                        var endIndex = paragraph.Value.IndexOf(sentence) + sentence.Length;
+                        var matchesInSentence = matches?.Where(m => m >= startIndex && m <= endIndex);
+
+                        if (matchesInSentence?.Any() ?? false)
+                        {
+                            foreach (var matchInSentence in matchesInSentence)
+                            {
+                                results.Add(new SearchResult(sentence, matchInSentence, paragraph.Value, paragraph.Key, -1,
+                                    rawFile.FileName, rawFile.FileIndex));
                             }
                         }
                     }
                 }
             }
-
-            foreach (var paragraph in paragraphs)
+            catch (Exception e)
             {
-                // Get all sentences in the paragraph
-                var sentences = Regex.Split(paragraph.Value, SentenceSplitPattern);
-
-                // Find all matches in paragraph
-                var matchCollection = matchExact ? GetWholeWordMatches(paragraph.Value, searchString, ignoreCase) : 
-                    Regex.Matches(paragraph.Value, Regex.Escape(searchString), RegexOptions.IgnoreCase);
-
-                var matches = matchCollection.Cast<Match>().Select(m => m.Index);
-
-                // Parse sentences to find matching search results
-                foreach (var sentence in sentences)
-                {
-                    // The following assumes no repeated sentences in paragraph - might want to improve this in future!
-                    var startIndex = paragraph.Value.IndexOf(sentence);
-                    var endIndex = paragraph.Value.IndexOf(sentence) + sentence.Length;
-                    var matchesInSentence = matches?.Where(m => m >= startIndex && m <= endIndex);
-
-                    if (matchesInSentence?.Any() ?? false)
-                    {
-                        foreach (var matchInSentence in matchesInSentence)
-                        {
-                            results.Add(new SearchResult(sentence, matchInSentence, paragraph.Value, paragraph.Key, -1, 
-                                rawFile.FileName, rawFile.FileIndex));
-                        }
-                    }
-                }
+                Debug.WriteLine($"Exception searching raw file (empty results will be returned) - {e}");
             }
 
             return results;

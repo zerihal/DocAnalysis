@@ -20,13 +20,14 @@ namespace DocParser.DocSearch
         public byte[] Content { get; }
 
         /// <inheritdoc/>
-        public RawFileType FileType { get; }
+        public RawFileType FileType { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RawFile"/> class.
         /// </summary>
         /// <param name="fileName">File name.</param>
         /// <param name="content">File binary content.</param>
+        /// <param name="index">File index in collection of files to search.</param>
         public RawFile(string fileName, byte[] content, int index)
         {
             FileIndex = index;
