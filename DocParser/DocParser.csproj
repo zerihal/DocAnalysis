@@ -13,7 +13,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>Document parsing; Document analysis; Hyperlink extraction; Link extraction</PackageTags>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <FileVersion>1.1.0.0</FileVersion>
     <Copyright>JPS</Copyright>
