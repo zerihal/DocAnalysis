@@ -11,7 +11,7 @@
     <PackageProjectUrl>https://github.com/zerihal/DocAnalysis</PackageProjectUrl>
     <RepositoryUrl>https://github.com/zerihal/DocAnalysis</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Document parsing; Document analysis; Hyperlink extraction; Link extraction</PackageTags>
+    <PackageTags>Document parsing;Document analysis;Hyperlink extraction;Link extraction;Links;Analysis</PackageTags>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Version>1.2.0</Version>
     <AssemblyVersion>1.2.1.0</AssemblyVersion>
