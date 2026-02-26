@@ -1,6 +1,7 @@
 ﻿using DocParser.DocSearch;
 using DocParser.Interfaces;
 using DocParser.Parsers;
+using DocParser.Utilities;
 
 namespace DocParser.Tests
 {
@@ -69,6 +70,20 @@ namespace DocParser.Tests
             {
                 Assert.Contains(link, expectedTextLinks);
             }
+        }
+
+        [Fact]
+        public async Task GetLinkInfoTest()
+        {
+            var linkInfos = await LinkUtils.GetLinksInfoAsync(_expectedLinks);
+            Assert.NotNull(linkInfos);
+            Assert.Equal(_expectedLinks.Count, linkInfos.Count());
+
+            // Check a couple of the link infos - first couple should have returned valid info and
+            // third one should have been normalized to have http:// added and return valid info.
+            Assert.True(linkInfos.ElementAt(0).IsReachable);
+            Assert.True(linkInfos.ElementAt(1).IsReachable);
+            Assert.NotEqual(linkInfos.ElementAt(2).OriginalUrl, linkInfos.ElementAt(2).FinalUrlAfterRedirects);
         }
 
         [Fact]

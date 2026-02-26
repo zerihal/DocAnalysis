@@ -67,7 +67,19 @@ namespace DocParser.DocSearch
         /// <inheritdoc/>
         public override int GetHashCode()
         {
+#if NETSTANDARD2_0
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + (Sentence?.GetHashCode() ?? 0);
+                hash = hash * 23 + Position.GetHashCode();
+                hash = hash * 23 + Page.GetHashCode();
+                hash = hash * 23 + (Document?.GetHashCode() ?? 0);
+                return hash;
+            }
+#else
             return HashCode.Combine(Sentence, Position, Page, Document);
+#endif
         }
 
         /// <summary>
