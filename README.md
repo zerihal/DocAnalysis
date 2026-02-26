@@ -1,6 +1,6 @@
 ## Assembly for Document Analysis Tools
 
-![CI](https://github.com/zerihal/DocAnalysis/actions/workflows/CI.yml/badge.svg)
+![Build & Test](https://github.com/zerihal/DocAnalysis/actions/workflows/dotnet.yml/badge.svg?branch=main)
 
 Functions include document parsing to extract hyperlinks from single or multiple documents, and document search methods to find single or multiple terms within one or more documents, returning an object with the terms within the sentence, paragraph, and document, giving the index within the paragraph for each. Advanced search functions allow for searching multiple terms and giving a match rating for each paragraphs that contains these (the higher the rating, the better the match over all given terms).
 
