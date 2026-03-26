@@ -27,6 +27,9 @@ _wordDocParser.LinksObtainedAsync += (o, e) =>
 
 _ = _wordDocParser.GetDocLinksAsync();
 
+// Obtain additional info on the links, such as whether they are reachable and link metadata.
+var linkInfos = await LinkUtils.GetLinksInfoAsync(docLinks);
+
 // *** Document searcher example code for searching one or more documents for key terms ***
 
 // Create instance of IDocSearcher for files specified (can also be streams or binary objects).
