@@ -17,11 +17,12 @@ namespace DocParser.Parsers
         public abstract IEnumerable<string> GetDocLinks();
 
         /// <inheritdoc/>
-        public async Task GetDocLinksAsync()
+        public async Task<IEnumerable<string>> GetDocLinksAsync()
         {
             var links = GetDocLinks();
             OnLinksObtained(new LinksObtainedEventArgs(links));
             await Task.CompletedTask;
+            return links;
         }
 
         /// <inheritdoc/>

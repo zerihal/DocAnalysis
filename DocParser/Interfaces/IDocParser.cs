@@ -24,16 +24,19 @@ namespace DocParser.Interfaces
         IEnumerable<string> GetDocLinks();
 
         /// <summary>
-        /// 
+        /// Checks if this instance of parser is applicable for the given file or extension.
         /// </summary>
-        /// <param name="fileOrExt"></param>
-        /// <returns></returns>
+        /// <param name="fileOrExt">File or file extension.</param>
+        /// <returns>
+        /// <see langword="True"/> if the file/extension is applicable for this instance of parser, 
+        /// otherwise <see langword="false"/>.
+        /// </returns>
         bool IsApplicableForFile(string fileOrExt);
 
         /// <summary>
         /// Gets the document hyperlinks (async), firing a LinksObtainedAsync event on completion.
         /// </summary>
-        /// <returns>Completed task.</returns>
-        Task GetDocLinksAsync();       
+        /// <returns>List of document hyperlinks.</returns>
+        Task<IEnumerable<string>> GetDocLinksAsync();       
     }
 }

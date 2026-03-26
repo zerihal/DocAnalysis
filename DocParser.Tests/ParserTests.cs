@@ -87,6 +87,31 @@ namespace DocParser.Tests
         }
 
         [Fact]
+        public async Task MultiDocParserTest()
+        {
+            var testFilePaths = new List<string>
+            {
+                Path.Combine(AppContext.BaseDirectory, "TestFiles", "WordTestDoc1.docx"),
+                Path.Combine(AppContext.BaseDirectory, "TestFiles", "TextTestDoc1.txt")
+            };
+
+            foreach (var filePath in testFilePaths)
+            {
+                Assert.True(File.Exists(filePath), $"Test file not found: {filePath}");
+            }
+
+            var filesAndLinks = await MultiDocParser.ParseDocs(testFilePaths);
+
+            Assert.NotNull(filesAndLinks);
+            Assert.Equal(testFilePaths.Count, filesAndLinks.Count);
+            
+            foreach (var fileAndLinks in filesAndLinks)
+            {
+                Assert.True(fileAndLinks.Value.Count() >= _expectedLinks.Count);
+            }
+        }
+
+        [Fact]
         public void SearchTest()
         {
             var searchResults = new SearchResults("test")
