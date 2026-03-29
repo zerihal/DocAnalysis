@@ -18,6 +18,12 @@ namespace DocParser.Parsers
         private static readonly List<IDocParser> _docParsers = new List<IDocParser>();
 
         /// <summary>
+        /// Occurs when the process of obtaining file links is initiated, allowing subscribers to handle or modify the
+        /// file link retrieval operation (if cancellation token specified for <see cref="ParseDocs(IEnumerable{string})"/>).
+        /// </summary>
+        public static event EventHandler<ObtainingFileLinksEventArgs>? ObtainingFileLinks;
+
+        /// <summary>
         /// Occurs when file links have been successfully obtained for the file currently being processed.
         /// </summary>
         public static event EventHandler<FileLinksObtainedEventArgs>? FileLinksObtained;
@@ -35,23 +41,30 @@ namespace DocParser.Parsers
         /// A collection of file paths representing the documentation files to be parsed. Each path should refer to a valid, 
         /// accessible file.
         /// </param>
+        /// <param name="cancellationToken">Cancellation token to stop the task and cease parsing files.</param>
         /// <returns>
         /// A task that represents the asynchronous operation. The task result contains a dictionary mapping each input
         /// file path to an enumerable collection of links extracted from that file. If a file contains no links, the
         /// corresponding collection will be empty.
         /// </returns>
-        public static async Task<IDictionary<string, IEnumerable<string>>> ParseDocs(IEnumerable<string> docPaths)
+        public static async Task<IDictionary<string, IEnumerable<string>>> ParseDocs(IEnumerable<string> docPaths, 
+            CancellationToken? cancellationToken = null)
         {
             var filesAndLinks = new Dictionary<string, IEnumerable<string>>();
             
             foreach (var docPath in docPaths)
             {
+                if (cancellationToken?.IsCancellationRequested ?? false)
+                    break;
+
                 IDocParser? parser = _docParsers.FirstOrDefault(p => p.IsApplicableForFile(docPath));
 
                 if (parser == null)
                 {
                     // Create a new parser for the file type, loading the file at same time.
                     parser = DocParserFactory.CreateDocParserForFile(docPath);
+
+                    // Add links obtained event handler for this parser to raise the MultiDocParser's FileLinksObtained event.
                     parser?.LinksObtainedAsync += (sender, args) =>
                     {
                         if (sender is IDocParser p)
@@ -66,8 +79,13 @@ namespace DocParser.Parsers
                     parser.LoadFile(docPath);
                 }
 
-                if (parser != null)
+                if (parser == null)
                 {
+                    OnFileLinksObtaining(null, new ObtainingFileLinksEventArgs(docPath, false));
+                }
+                else
+                {
+                    OnFileLinksObtaining(parser, new ObtainingFileLinksEventArgs(docPath, true));
                     var links = await parser.GetDocLinksAsync();
                     filesAndLinks.Add(docPath, links);
                 }
@@ -79,6 +97,11 @@ namespace DocParser.Parsers
         private static void OnFileLinksObtained(object sender, FileLinksObtainedEventArgs e)
         {
             FileLinksObtained?.Invoke(sender, e);
+        }
+
+        private static void OnFileLinksObtaining(object? sender, ObtainingFileLinksEventArgs e)
+        {
+            ObtainingFileLinks?.Invoke(sender, e);
         }
     }
 }

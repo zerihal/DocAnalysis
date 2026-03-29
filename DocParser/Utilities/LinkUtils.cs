@@ -3,6 +3,9 @@ using System.Diagnostics;
 
 namespace DocParser.Utilities
 {
+    /// <summary>
+    /// Link utilities class for functions such as checking link status.
+    /// </summary>
     public static class LinkUtils
     {
         /// <summary>

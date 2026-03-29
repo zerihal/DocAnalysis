@@ -33,7 +33,7 @@ namespace DocParser.Utilities
         /// <param name="responseHeaders">HTTP response headers.</param>
         /// <param name="responseContentType">HTTP response content type.</param>
         /// <param name="finalUrlAfterRedirects">Final URL after any redirects.</param>
-        public LinkInfo(string originalUrl, bool isReachable, int responseStatusCode, HttpResponseHeaders responseHeaders, string responseContentType, string finalUrlAfterRedirects)
+        public LinkInfo(string originalUrl, bool isReachable, int responseStatusCode, HttpResponseHeaders? responseHeaders, string responseContentType, string finalUrlAfterRedirects)
         {
             OriginalUrl = originalUrl;
             IsReachable = isReachable;
