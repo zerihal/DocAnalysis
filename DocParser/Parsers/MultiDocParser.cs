@@ -13,20 +13,57 @@ namespace DocParser.Parsers
     /// from various documentation files. It raises the FileLinksObtained event when links are obtained from a file, 
     /// allowing subscribers to react to link discovery. This class is thread-safe for static method usage.
     /// </remarks>
+    [Obsolete("Use MultiDocParserInstance instead for better control over event subscriptions and instance management.")]
     public static class MultiDocParser
     {
-        private static readonly List<IDocParser> _docParsers = new List<IDocParser>();
+        private static readonly MultiDocParserInstance _instance = new MultiDocParserInstance();
+
+        /// <inheritdoc cref="MultiDocParserInstance.ObtainingFileLinks"/>
+        public static event EventHandler<ObtainingFileLinksEventArgs>? ObtainingFileLinks
+        {
+            add => _instance.ObtainingFileLinks += value;
+            remove => _instance.ObtainingFileLinks -= value;
+        }
+
+        /// <inheritdoc cref="MultiDocParserInstance.FileLinksObtained"/>
+        public static event EventHandler<FileLinksObtainedEventArgs>? FileLinksObtained
+        {
+            add => _instance.FileLinksObtained += value;
+            remove => _instance.FileLinksObtained -= value;
+        }
+
+        /// <inheritdoc cref="MultiDocParserInstance.ParseDocs(IEnumerable{string}, CancellationToken?)"/>
+        public static async Task<IDictionary<string, IEnumerable<string>>> ParseDocs(IEnumerable<string> docPaths,
+            CancellationToken? cancellationToken = null)
+        {
+            return await _instance.ParseDocs(docPaths, cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Provides functionality to asynchronously parse multiple documentation files and extract links from each file.
+    /// Supports event notifications for file link retrieval operations and results.
+    /// </summary>
+    /// <remarks>
+    /// Use this class to process a collection of documentation files, automatically selecting or creating appropriate 
+    /// parsers for each file type. Subscribers can handle events to customize or monitor the file link extraction 
+    /// process. The class is not thread-safe; concurrent access should be externally synchronized.
+    /// </remarks>
+    public class MultiDocParserInstance
+    {
+        private readonly List<IDocParser> _docParsers = new List<IDocParser>();
 
         /// <summary>
         /// Occurs when the process of obtaining file links is initiated, allowing subscribers to handle or modify the
-        /// file link retrieval operation (if cancellation token specified for <see cref="ParseDocs(IEnumerable{string})"/>).
+        /// file link retrieval operation (if cancellation token specified for <see cref="ParseDocs(IEnumerable{string}, 
+        /// CancellationToken?)"/>).
         /// </summary>
-        public static event EventHandler<ObtainingFileLinksEventArgs>? ObtainingFileLinks;
+        public event EventHandler<ObtainingFileLinksEventArgs>? ObtainingFileLinks;
 
         /// <summary>
         /// Occurs when file links have been successfully obtained for the file currently being processed.
         /// </summary>
-        public static event EventHandler<FileLinksObtainedEventArgs>? FileLinksObtained;
+        public event EventHandler<FileLinksObtainedEventArgs>? FileLinksObtained;
 
         /// <summary>
         /// Asynchronously parses the specified documentation files and retrieves the collection of links found in each
@@ -47,11 +84,11 @@ namespace DocParser.Parsers
         /// file path to an enumerable collection of links extracted from that file. If a file contains no links, the
         /// corresponding collection will be empty.
         /// </returns>
-        public static async Task<IDictionary<string, IEnumerable<string>>> ParseDocs(IEnumerable<string> docPaths, 
+        public async Task<IDictionary<string, IEnumerable<string>>> ParseDocs(IEnumerable<string> docPaths,
             CancellationToken? cancellationToken = null)
         {
             var filesAndLinks = new Dictionary<string, IEnumerable<string>>();
-            
+
             foreach (var docPath in docPaths)
             {
                 if (cancellationToken?.IsCancellationRequested ?? false)
@@ -90,16 +127,16 @@ namespace DocParser.Parsers
                     filesAndLinks.Add(docPath, links);
                 }
             }
-            
+
             return filesAndLinks;
         }
 
-        private static void OnFileLinksObtained(object sender, FileLinksObtainedEventArgs e)
+        private void OnFileLinksObtained(object sender, FileLinksObtainedEventArgs e)
         {
             FileLinksObtained?.Invoke(sender, e);
         }
 
-        private static void OnFileLinksObtaining(object? sender, ObtainingFileLinksEventArgs e)
+        private void OnFileLinksObtaining(object? sender, ObtainingFileLinksEventArgs e)
         {
             ObtainingFileLinks?.Invoke(sender, e);
         }
