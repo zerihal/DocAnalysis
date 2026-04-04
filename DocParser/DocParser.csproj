@@ -14,8 +14,8 @@
     <PackageTags>Document parsing;Document analysis;Hyperlink extraction;Link extraction;Links;Analysis</PackageTags>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Version>1.2.2</Version>
-    <AssemblyVersion>1.2.2.3</AssemblyVersion>
-    <FileVersion>1.2.2.3</FileVersion>
+    <AssemblyVersion>1.2.2.4</AssemblyVersion>
+    <FileVersion>1.2.2.4</FileVersion>
     <Copyright>JPS</Copyright>
     <PackageReadmeFile>PACKAGE_README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>

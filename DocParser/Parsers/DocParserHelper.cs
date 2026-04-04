@@ -23,7 +23,9 @@ namespace DocParser.Parsers
 
             foreach (Match match in matches)
             {
-                urls.Add(match.Value);
+                // As we are extracting from plaintext, we may have some trailing punctuation that
+                // is not actually part of the URL, so trim common trailing punctuation characters
+                urls.Add(match.Value.TrimEnd([',', '.', ')', ']', ':']));
             }
 
             return urls;
